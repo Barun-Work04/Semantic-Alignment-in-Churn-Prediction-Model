@@ -1,22 +1,47 @@
-<<<<<<< Updated upstream
+<img src="./screenshots/Semantic Alignment.png.png" alt="Code Review Agent" width="100%" style="max-width: 1584px; height: auto;" />
+
 # Semantic Alignment in Churn Prediction (Case Study)
 
 This project is a productionized case study that shows how to diagnose and correct
 semantic misalignment in machine learning systems. The example domain is gaming churn,
 but the framework generalizes across industries.
 
-## Problem Statement
+## ML Pipeline (End-to-End)
+
+### Dataset and Features
+
+- Dataset: [data/gaming_churn.csv](data/gaming_churn.csv)
+- Behavioral + categorical features: engagement, session activity, and player profile
+- Goal label: churn outcome from historical behavior
+
+### Preprocessing and Feature Consistency
+
+- Cleaning, encoding, and scaling to match training and inference behavior
+- A stable feature order is persisted in [models/col_order.pkl](models/col_order.pkl)
+- A fitted scaler is persisted in [models/scaler.pkl](models/scaler.pkl)
+
+### Synthetic Data via GAN (Class Balance)
+
+- A GAN-based balancing step is used to address class imbalance and improve coverage
+- Synthetic samples increase representation of rare churn behaviors
+- The model is validated on real data to avoid synthetic leakage
+
+Why GAN?
+
+- It preserves multivariate feature relationships better than naive oversampling
+- It reduces bias toward the dominant class while retaining realistic patterns
+
+### Model Training and Artifacts
+
+- Model: RandomForest (trained offline and saved as [models/best_model.pkl](models/best_model.pkl))
+- Inference logic: [backend/model/predict.py](backend/model/predict.py)
+- Training and preprocessing notebooks: [notebooks/](notebooks)
+
+## Semantic Misalignment (Core Research Focus)
 
 Modern ML models often fail not because of weak algorithms, but because training labels
 encode outcomes while stakeholders expect predictions about intent or future behavior.
-
-This mismatch is semantic misalignment. It creates models that are highly confident,
-technically correct, and practically misleading.
-
-This repository demonstrates how to detect and correct semantic misalignment using a
-structured framework and a hybrid ML + rules alignment layer.
-
-## What Is Semantic Misalignment?
+This mismatch is semantic misalignment.
 
 Semantic misalignment occurs when:
 
@@ -25,96 +50,93 @@ Semantic misalignment occurs when:
 
 ### Example (Gaming Churn)
 
-- Label: Player churned
-- Reality: churn can mean burnout, lifecycle completion, or external factors
-- Business intent: which players are at risk of disengagement
+- Label: player churned
+- Reality: churn may represent burnout, lifecycle completion, or external factors
+- Intent: identify players at risk of disengagement
 
 The model learns what churn looked like in the past, not why a player is likely to leave next.
 
-## Framework: Semantic Alignment (Reusable Across ML Systems)
+## Semantic Misalignment (Core Research Focus)
 
-This project formalizes a 4-step framework that applies to many domains.
+### Framework: Semantic Alignment (Reusable Across ML Systems)
 
-### Step 1: Identify Label Origin
+Machine learning models often fail not because the algorithm is weak, but because **the training labels do not perfectly represent the real-world decision we care about**.
 
-Ask:
+This project introduces a simple **4-step Semantic Alignment framework** to detect and correct this problem.
 
-- How were labels generated?
-- What real-world event do they represent?
+---
 
-Examples:
+### 1. Identify Label Origin
 
-- Churn: account deletion after N days
-- Fraud: detected fraud cases (not all fraud)
-- Medical: diagnosed cases (not early-stage disease)
+Understand **how the dataset labels were created**.
 
-### Step 2: Identify Prediction Intent
+**Ask:**  
+*What real-world event produced this label?*
 
-Ask:
+**Examples**
+- **Churn model:** label = user deleted account after *N* days  
+- **Fraud model:** label = fraud cases that were *caught*  
+- **Medical model:** label = *diagnosed* disease cases  
 
-- What does the user actually want to predict?
+These labels represent **observed events**, not necessarily the true underlying condition.
 
-Examples:
+---
 
-- Disengagement risk
-- Financial instability risk
-- Health deterioration risk
+### 2. Identify Prediction Intent
 
-### Step 3: Detect Semantic Mismatch
+Define **what the system actually needs to predict**.
 
-Common signals:
+**Ask:**  
+*What decision does the user want help with?*
 
-- Counter-intuitive predictions
-- Edge cases behaving backwards
-- Extremely confident outputs in obvious scenarios
-- Model predicts churn for high engagement users
+**Examples**
+- Predict **disengagement risk** (not just account deletion)  
+- Predict **fraud risk** (not only confirmed fraud)  
+- Predict **health deterioration risk** (not just diagnosed illness)
 
-This is not overfitting. It is objective misalignment.
+---
 
-### Step 4: Apply a Semantic Alignment Layer
+### 3. Detect Semantic Mismatch
 
-Correction strategies:
+Check whether the model behaves **in ways that contradict real-world logic**.
 
-- Hybrid rule + ML systems
-- Task reframing
-- Label reinterpretation
-- Post-prediction constraints
+**Common signals**
+- Counter-intuitive predictions  
+- Edge cases behaving backwards  
+- Extremely confident outputs in obvious scenarios  
 
-This project uses a hybrid alignment layer:
+**Example (this project)**  
+A player with **very high engagement being predicted to churn**.
 
-- Rules capture near-certain real-world semantics
-- ML handles complex interactions and tradeoffs
+This usually indicates **objective misalignment**, not overfitting.
 
-## Case Study: Gaming Churn Prediction
+---
 
-### Why Gaming?
+### 4. Apply a Semantic Alignment Layer
 
-Gaming data provides:
+Introduce a lightweight **alignment layer** between the ML output and the final prediction.
 
-- Rich behavioral signals
-- Clear semantic ambiguity in churn labels
-- Intuitive edge cases that reveal misalignment
+**Possible approaches**
+- Logical rules  
+- Constraints  
+- Hybrid ML + rule systems  
 
-### Key Finding
+**In this project**
+- **Rules capture obvious real-world behavior**
+- **ML handles complex interaction patterns**
 
-The model learned:
+This keeps the model flexible while preventing **clearly incorrect predictions**.
 
-"High engagement -> churn" (many churned users burned out)
 
-But business logic expects:
-
-"Low engagement -> churn risk"
-
-This contradiction exposed semantic bias in the dataset, not a modeling flaw.
+This project implements a hybrid alignment layer in
+[backend/model/semantic_alignment.py](backend/model/semantic_alignment.py).
 
 ### Concrete Misalignment Examples (from this project)
 
 - Burnout pattern: very high playtime + long sessions can indicate churn risk
 - Impossible session math: weekly session demand exceeds available time
-- Binge pattern: very few sessions but very high daily playtime
+- Binge pattern: few sessions but very high daily playtime
 - Near-zero engagement: minimal activity should override a confident stay prediction
-
-These cases are encoded as explicit alignment rules layered on top of the ML output.
 
 ## Generalization Beyond Gaming
 
@@ -127,22 +149,18 @@ Semantic alignment applies broadly:
 
 Common pattern: labels describe what happened, not what will happen.
 
-## Why Not Just Retrain?
+### Why Not Just Retrain the Model?
 
-Retraining without correcting semantic misalignment optimizes the wrong objective faster.
-More data amplifies the same misunderstanding. Accuracy may improve while usefulness declines.
+* **Not Cost-Efficient:** Retraining repeatedly increases compute and infrastructure costs without fixing the root issue.
+* **Time-Consuming:** Each retraining cycle requires time for training, evaluation, and redeployment.
+* **Intent–Label Misalignment Persists:** Even with new data, user intent may still not perfectly match the dataset labels, so the same semantic mismatch can remain.
+
 
 ## What This Project Contributes
 
-This project does not claim to solve churn universally or replace ML models.
-It demonstrates how to identify and correct semantic bias between labels and intent.
-
-Outcomes:
-
-- Explainable behavior in edge cases
-- Transferable alignment framework
-- Industry-relevant methodology
-- Research-oriented case study
+- A practical method to detect semantic bias between labels and intent
+- A hybrid alignment layer that preserves ML behavior while fixing edge cases
+- A reusable framework demonstrated end-to-end in a real deployment
 
 ## System Overview
 
@@ -150,6 +168,23 @@ Outcomes:
 - Semantic alignment: rule-based probability adjustments
 - API: FastAPI inference service
 - UI: Gradio interactive interface
+
+## UI and API
+
+- UI entry point: [backend/ui/app.py](backend/ui/app.py)
+- API entry point: [backend/api/main.py](backend/api/main.py)
+
+## Dockerization
+
+- Lightweight container build using [Dockerfile](Dockerfile)
+- [start.sh](start.sh) launches FastAPI and Gradio in one container
+
+## Cloud Deployment (AWS)
+
+- Containerized with Docker and deployed to Amazon ECS (Fargate)
+- CloudWatch logs used for runtime visibility
+- Public UI: http://35.154.88.37:7860
+- Public API: http://35.154.88.37:8000
 
 ## Repository Structure
 
@@ -208,16 +243,32 @@ The CI workflow:
 
 - Runs validation tests
 - Performs an API smoke test
-- Builds and pushes Docker images
+
+## Screenshots
+
+![Gradio UI](screenshots/churn-ui.png)
+![Stay Prediction](screenshots/stay-ui.png)
+![CloudWatch Logs](screenshots/cloudwatch-logs.png)
+![ECS Task](screenshots/aws-ecs-task.png.png)
 
 
-## Known Challenges Encountered
+## Key Challenges Faced During the Project
 
-- The model learned churn patterns that contradicted business intent
-- High engagement cases were frequently labeled as churn due to burnout
-- Raw ML outputs looked correct statistically but failed on real-world semantics
+1. Model training and feature consistency
+   The UI captures four engagement inputs, while the model expects a full feature set.
+   Neutral defaults plus alignment logic were required to keep inference stable.
 
-The alignment layer addresses these mismatches without changing the underlying model.
+2. Semantic alignment behavior
+   Raw ML predictions sometimes contradicted intuitive behavior (for example, high
+   engagement flagged as churn), requiring explicit rule-based corrections.
 
+3. Dockerization and dependencies
+   Building a slim container that included the model, API, UI, and correct libraries
+   required multiple iterations of dependency and layout fixes.
 
->>>>>>> Stashed changes
+4. Networking and port exposure
+   Gradio needed correct host binding and port exposure to be reachable externally.
+
+5. AWS ECS deployment
+   ECS setup involved VPC, subnet, and security group tuning plus public access config.
+
