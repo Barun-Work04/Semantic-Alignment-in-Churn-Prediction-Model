@@ -69,7 +69,7 @@ with gr.Blocks(title="🎮 Gaming Churn Predictor") as demo:
     gr.Markdown(
         """
         # 🎮 Gaming Churn Prediction Engine
-        **Hybrid ML + Semantic Alignment** — predicts whether a player will stay or leave.
+        **Hybrid ML + Semantic Alignment** — a churn prediction case study focused on semantic alignment.
 
         Adjust the four engagement sliders and click **Predict**.
         """
@@ -123,8 +123,8 @@ with gr.Blocks(title="🎮 Gaming Churn Predictor") as demo:
         - 🟢 Player Will STAY → high / balanced engagement (model class 0)
         - 🔴 Player Will CHURN → low or unsustainably high engagement (model class 1)
 
-        *Source = `semantic_rule` means a rule adjusted the ML probability;*
-        *`ml_model` means the ML prediction was trusted directly.*
+        *Source = `semantic_rule` means the semantic alignment layer adjusted the ML probability;*
+        *`ml_model` means the ML prediction was trusted directly (no semantic adjustment).*
 
         *Flags: `SESSION_MATH_IMPOSSIBLE` | `BURNOUT_RISK_HIGH` | `BINGE_SESSION_PATTERN` | `NEAR_ZERO_ENGAGEMENT`*
         """
