@@ -1,4 +1,4 @@
-<img src="./screenshots/Semantic Alignment.png.png" alt="Code Review Agent" width="100%" style="max-width: 1584px; height: auto;" />
+<img src="./screenshots/Semantic Alignment.png" alt="Code Review Agent" width="100%" style="max-width: 1584px; height: auto;" />
 
 # Semantic Alignment in Churn Prediction (Case Study)
 
