@@ -75,6 +75,10 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Normalize image owner
+        run: |
+          echo "IMAGE_OWNER=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - name: Build image
         uses: docker/build-push-action@v6
         with:
@@ -111,4 +115,4 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository }}/churn-prediction:latest
+          tags: ghcr.io/${{ env.IMAGE_OWNER }}/churn-prediction:latest
