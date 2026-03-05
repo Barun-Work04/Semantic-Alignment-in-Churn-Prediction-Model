@@ -1,0 +1,51 @@
+# Python bytecode - compiled cache, never needed in Docker
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment - Docker installs its own fresh environment
+venv/
+.venv/
+env/
+
+# Jupyter notebooks - not needed for running the app
+notebooks/
+*.ipynb
+.ipynb_checkpoints/
+
+# Training data and artifacts (not needed at runtime)
+data/
+reports/
+*.csv
+mlflow.db
+.gradio/
+
+# Git history - bloats the image for no reason
+.git/
+.gitignore
+
+# VS Code settings - IDE config, irrelevant inside container
+.vscode/
+
+# Env files
+.env
+
+# Windows OS files
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# The two individual Dockerfiles we are NOT using
+src/api/Dockerfile
+src/ui/Dockerfile
+
+# Docker compose file is not needed inside the image
+docker-compose.yml
+
+# Frontend/build/test artifacts
+node_modules/
+dist/
+build/
+tests/

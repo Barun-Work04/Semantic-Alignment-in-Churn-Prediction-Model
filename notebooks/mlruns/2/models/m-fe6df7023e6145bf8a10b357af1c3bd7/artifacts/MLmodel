@@ -1,0 +1,23 @@
+artifact_path: file:///f:/Coding/Machine Learning/ML-CHURN-gaming/notebooks/mlruns/2/models/m-fe6df7023e6145bf8a10b357af1c3bd7/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.10.9
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.7.2
+    skops_trusted_types: null
+mlflow_version: 3.10.0
+model_id: m-fe6df7023e6145bf8a10b357af1c3bd7
+model_size_bytes: 39064789
+model_uuid: m-fe6df7023e6145bf8a10b357af1c3bd7
+prompts: null
+run_id: 7a981cf1732246d5a42828cb6cc0562a
+utc_time_created: '2026-03-04 10:13:59.756504'
